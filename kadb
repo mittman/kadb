@@ -1,0 +1,66 @@
+#!/bin/bash
+###############
+### kadb ######
+version=0.5 ###
+###############
+
+notify=false
+#prefix="/storage/emulated/legacy"
+prefix="/storage/self/primary"
+
+err() { echo "$@"; [[ "$notify" = true ]] && notify-send "ADB :: $@"; exit 1; }
+
+ADB=$(type -p adb 2>/dev/null)
+GUI=$(ls -d $(dirname $0)/kadb-select 2>/dev/null)
+[ -z "$ADB" ] && err "Missing package: android-tools"
+[ -z "$1" ] && err "USAGE: $0 {[file]|[file] [file]...} [dir]"
+USB=$($ADB devices -l 2>/dev/null | grep -o "device:\S*" | awk -F : '{print $2}')
+[ -z "$USB" ] && err "Device not found"
+
+action="pull"
+destDir="${@: -1}"
+srcFiles="${@:1:$#-1}"
+
+if [ "$1" = "GUI" ]; then
+  [ -z "$GUI" ] && err "Missing kadb-select"
+  srcFiles="$($GUI $2)"
+  [ -z "$srcFiles" ] && err "No files selected"
+  shift
+  [ -z "$2" ] || shift
+  destDir="$@"
+fi
+
+[[ "$srcFiles" =~ ^// ]] && srcFiles="${prefix}/${srcFiles##\/\/}"
+[[ "$destDir" =~ /$ ]] && destDir="${destDir%%\/}"
+[ -d "$destDir" ] || action="push"
+
+if [ "$action" = "pull" ]; then
+  IFS=$(echo -en "\n\b")
+  for f in $srcFiles; do
+    input+=("$($ADB shell ls -d "$f" 2>/dev/null | tr -d '\015')")
+  done
+else
+  srcFiles=$(echo "$srcFiles" | sed 's/ \//\n\//g')
+  IFS=$(echo -en "\n\b")
+  for f in $srcFiles; do
+    input+=($(readlink -f $f 2>/dev/null))
+  done
+fi
+
+for i in ${input[@]}; do
+  if [ "$action" = "pull" ]; then
+    pathDir=$($ADB shell dirname $i 2>/dev/null | tr -d '\015')
+    pathName=$($ADB shell basename $i 2>/dev/null | tr -d '\015')
+    if [ ! -z "$pathDir" -a ! -z "$pathName" ]; then
+      echo "ADB <== $i"
+	  [[ "$notify" = true ]] && notify-send "ADB <== $pathDir/$pathName $destDir/"
+      pull=$($ADB $action -a $pathDir/$pathName $destDir/)
+    fi
+  else
+    echo "ADB ==> $i"
+    [[ "$notify" = true ]] && notify-send "ADB ==> $i $destDir/"
+    push=$($ADB $action $i $destDir/ 2>&1)
+    intent="android.intent.action.MEDIA_MOUNTED"
+    $ADB shell am broadcast -a $intent -d "file://$destDir" | tr -d '\015'
+  fi
+done
