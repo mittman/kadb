@@ -1,7 +1,7 @@
-# kadb
+# kadb - wrapper around adb
 
 USAGE: kadb [SOURCE] [DEST]
-- Note: supports globbing; need to change the path to the SDcard
+- Note: supports globbing; change notify to true for notify-send notifications
 
 ### Caja Actions ###
 ![Retrieve file](screenshot-kadb-retrieve.png)
@@ -18,3 +18,6 @@ USAGE: kadb [SOURCE] [DEST]
 1. Save `kadb` and `kadb-select` to `/opt/bin`
 2. Import the 3 .desktop files into Caja Actions Configuration Tool
 3. Adjust paths as needed
+
+### offdroid
+- Copy photos from Android device (and check hashes)
