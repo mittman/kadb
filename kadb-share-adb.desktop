@@ -1,0 +1,22 @@
+[Desktop Entry]
+Type=Action
+Name[en_US]=Share via ADB
+Name[en]=Share via ADB
+Name[C]=Share via ADB
+Tooltip[en_US]=Saves to /storage/sdcard1/Share/
+Tooltip[en]=Saves to /storage/sdcard1/Share/
+Tooltip[C]=Saves to /storage/sdcard1/Share/
+Icon[en_US]=document-send
+Icon[en]=document-send
+Icon[C]=document-send
+ToolbarLabel[en_US]=Share via ADB
+ToolbarLabel[en]=Share via ADB
+ToolbarLabel[C]=Share via ADB
+Profiles=profile-zero;
+
+[X-Action-Profile profile-zero]
+Name[en_US]=Default profile
+Name[en]=Default profile
+Name[C]=Default profile
+Exec=/opt/bin/kadb %F /storage/sdcard1/Share/
+ExecutionMode=Embedded

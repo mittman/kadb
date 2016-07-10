@@ -1,0 +1,24 @@
+[Desktop Entry]
+Type=Action
+Name[en_US]=Retrieve via ADB (SD)
+Name[en]=Retrieve via ADB (SD)
+Name[C]=Retrieve via ADB (SD)
+Tooltip[en_US]=Download file(s) to here
+Tooltip[en]=Download file(s) to here
+Tooltip[C]=Download file(s) to here
+Icon[en_US]=media-flash
+Icon[en]=media-flash
+Icon[C]=media-flash
+TargetContext=false
+TargetLocation=true
+ToolbarLabel[en_US]=Retrieve via ADB (SD)
+ToolbarLabel[en]=Retrieve via ADB (SD)
+ToolbarLabel[C]=Retrieve via ADB (SD)
+Profiles=profile-zero;
+
+[X-Action-Profile profile-zero]
+Name[en_US]=Default profile
+Name[en]=Default profile
+Name[C]=Default profile
+Exec=/opt/bin/kadb GUI external %f/
+ExecutionMode=Embedded

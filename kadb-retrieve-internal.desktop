@@ -1,0 +1,24 @@
+[Desktop Entry]
+Type=Action
+Name[en_US]=Retrieve via ADB
+Name[en]=Retrieve via ADB
+Name[C]=Retrieve via ADB
+Tooltip[en_US]=Download file(s) to here
+Tooltip[en]=Download file(s) to here
+Tooltip[C]=Download file(s) to here
+Icon[en_US]=document-save-as
+Icon[en]=document-save-as
+Icon[C]=document-save-as
+TargetContext=false
+TargetLocation=true
+ToolbarLabel[en_US]=Retrieve via ADB
+ToolbarLabel[en]=Retrieve via ADB
+ToolbarLabel[C]=Retrieve via ADB
+Profiles=profile-zero;
+
+[X-Action-Profile profile-zero]
+Name[en_US]=Default profile
+Name[en]=Default profile
+Name[C]=Default profile
+Exec=/opt/bin/kadb GUI %f/
+ExecutionMode=Embedded

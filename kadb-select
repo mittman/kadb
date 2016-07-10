@@ -1,0 +1,69 @@
+#!/bin/bash
+###################
+### kadb-select ###
+version=0.2 #######
+###################
+
+external="/storage/sdcard1"
+#internal="/storage/emulated/legacy"
+internal="/storage/self/primary"
+
+if [ "$1" = "external" ]; then
+  tree="$external"
+else
+  tree="$internal"
+fi
+
+ADB=$(type -p adb 2>/dev/null)
+
+loop="true"
+while [ "$loop" = "true" ]; do
+  folders=$($ADB shell "ls -d ""\"$tree""\"/*/ 2>/dev/null" | tr -d '\015' | sort | sed -e "s|$internal|internal|" -e "s|$external|external|")
+  if [[ "$folders" ]]; then
+    unset dirs
+    IFS=$(echo -en "\n\b")
+    for d in $folders; do
+      dirs+=("$d")
+    done
+    dirname=$(zenity --list --title kadb-GUI --height 500 --width 300 --text "Navigate: $tree" --column x ${dirs[@]} 2>/dev/null | sort | sed -e "s|internal|$internal|" -e "s|external|$external|")
+    testdir=$($ADB shell "ls -d ""\"$dirname""\" 2>/dev/null" | tr -d '\015')
+    if [ -z "$dirname" ]; then
+      loop="cancel"
+    elif [ "$dirname" != "$testdir" ]; then
+      loop="file"
+    else
+      tree="${dirname%%/}"
+    fi
+  else
+    loop="empty"
+  fi
+done
+
+dirname="$tree"
+list=$($ADB shell "ls ""\"$dirname""\" 2>/dev/null" | tr -d '\015' | sort | sed -e "s|$internal|internal|" -e "s|$external|external|")
+sorted=$($ADB shell "busybox ls -p ""\"$dirname""\" 2>/dev/null" | tr -d '\015' | grep -v "/$" | sort | sed -e "s|$internal|internal|" -e "s|$external|external|")
+
+if [[ "$list" ]]; then
+
+  unset files
+  IFS=$(echo -en "\n\b");
+  if [[ "$sorted" ]]; then
+    for f in $sorted; do
+      files+=(""\"$f"\"")
+    done
+  else
+    for f in $list; do 
+      filetype=$($ADB shell "[ -f ""\"$dirname/$f""\" ] && echo ""\"$f""\"")
+      [ -z "$filetype" ] || files+=(""\"$f"\"")
+    done
+  fi
+
+  items=$(zenity --list --title kadb-GUI --height 500 --width 500 --multiple --text "Select file(s)" --column x ${files[@]} 2>/dev/null | sort | sed -e "s|internal|$internal|" -e "s|external|$external|")
+  items="${items//\"}"
+
+  IFS="|"
+  for basename in $items; do
+    echo $($ADB shell "ls ""\"$dirname/$basename"\""" | tr -d '\015')
+  done
+
+fi
